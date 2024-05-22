@@ -77,7 +77,7 @@ Preparing Table Dashboard with relevant visuals. The link to the dashboard can b
 
 ### 4.3. A/B Testing
 Using A/B testing online calculator for testing statistical significance of certain findings.  
-Results are presented in the PDF file [4.3. AB_Testing results](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/4.3.%20AB%20Testing%20results_session_duration_2024.pdf)
+Results are presented in the PDF file [4.3. AB Testing results](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/4.3.%20AB%20Testing%20results_session_duration_2024.pdf)
 
 ## 5.	Communicating analysis results and providing actionable insights
 Preparing presentation for business. The presentation has benn uploaded in PDF file [5. Presentation](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/5.%20Presentation_session_duration_analysis_2024.pdf)
