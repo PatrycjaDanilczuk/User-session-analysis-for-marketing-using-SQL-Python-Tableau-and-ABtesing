@@ -1,0 +1,159 @@
+/*2.2. Sessions aggregated query*/
+-- selecting columns for calculations; converting event_timestamp into datetime in microseconds
+WITH
+  events AS (
+  SELECT
+    user_pseudo_id,
+    category,
+    -- creating unique user_session_id from user_pseudo_id and category - distinct count of user_pseudo_id is 270.154 and SELECT (DISTINCT (user_pseudo_id) + category (desktop, mobile, tablet) is 274.362, which means that there are users with events on different devices, which should be considered as separate sessions
+    CONCAT(user_pseudo_id, '_', category) AS user_session_id,
+    campaign,
+    country,
+    event_name,
+    purchase_revenue_in_usd,
+    TIMESTAMP_MICROS(event_timestamp) AS event_time
+  FROM
+    `turing_data_analytics.raw_events`
+  ORDER BY
+    user_session_id
+    ),
+
+  -- calculating difference between events in seconds with partition by user_session_id
+  events_time AS (
+  SELECT
+    *,
+    LAG(event_time, 1) OVER (PARTITION BY user_session_id ORDER BY  event_time) previous_event,
+    TIMESTAMP_DIFF(event_time, LAG(event_time, 1) OVER (PARTITION BY user_session_id ORDER BY event_time), SECOND) AS time_since_last_event,
+  FROM
+    events
+  ),
+
+  -- assigning breaks between sessions (if the difference between events is longer than 30 minutes, this will be considered as a break in session, the event assigned as break in session will be considered as a start of new session)
+  break_in_session AS (
+  SELECT
+    *,
+    CASE
+      WHEN time_since_last_event > 1800 THEN 1 ELSE 0 END AS session_break,
+  FROM
+    events_time),
+
+  -- assigning session number per user_session_id (one user can have multiple sessions additionally on different devices)
+  session_no AS (
+  SELECT
+    *,
+    SUM(session_break) OVER (PARTITION BY user_session_id ORDER BY event_time) AS session_number
+  FROM
+  break_in_session
+  ),
+
+  -- creating session_id (each session is assigned with individual id)
+  sessionID AS (
+  SELECT
+    *,
+    CONCAT(user_session_id, "_", session_number) AS session_id
+  FROM
+  session_no
+  ),
+
+  -- getting session start time and session end time for each session
+  session_start_end AS (
+  SELECT
+    *,
+    MIN(event_time) OVER (PARTITION BY session_id) AS session_start,
+    MAX(event_time) OVER (PARTITION BY session_id) AS session_end,
+  -- assigning purchase
+    CASE
+      WHEN event_name = 'purchase' THEN 1 ELSE 0 END AS purchase
+  FROM sessionID
+  ),
+
+  sessionDuration AS (
+  SELECT
+    *,
+    -- calculating session duration
+    DATETIME_DIFF(session_end, session_start, SECOND) AS session_duration,
+    -- filling nulls in campaign with longest name of campaign in a session (the actual campaigns have longer names that eg. (organic), (referral), (direct), <Other>, that approach will give a credit to actual campaigns - the session will be assigned ta a campaign if there was at least one event in the session assigned to a campaign
+    MAX(campaign) OVER (PARTITION BY session_id) AS campaign_name,
+    -- assigning flag for sessions that contain a purchase
+    MAX(purchase) OVER (PARTITION BY session_id) AS purchase_flag,
+    SUM(purchase_revenue_in_usd) OVER (PARTITION BY session_id) AS purchase_revenue,
+    -- assigning weekday of a session (session start date gets credit for a day of the session)
+    FORMAT_DATE('%A', session_start) AS weekday,
+    -- assigning session day (session start day)
+    DATE_TRUNC(session_start, DAY) as session_date,
+    DATE_TRUNC(session_start, MONTH) AS session_month
+  FROM
+  session_start_end
+  ),
+
+-- creating table of distinct sessions with data per session: session start, session end, session duration, session date, session month, weekday (session start day gets the credit), campaign_name, campaign (sessions with no campaign assigned as no_campaign; session with at least one event from campaign take credit as campaign session), category, user_pseudo_id, purchase flag (if there was a purchase event in the session, the session is flaged 1), purchase revenue, bounce in 5 seconds flag (session ended up within 5 seconds is flagged 1), bounce in 60 seconds flag (session ended up in 60 seconds is flagged 1), user engagement session segment (segmenting sessions into 5 categories based on time spend on site)
+
+final AS (
+  SELECT DISTINCT
+  session_id,
+  session_start,
+  session_end,
+  session_duration,
+  session_date,
+  weekday,
+  campaign_name,
+  -- assinginig camapign and no_campaign sessions
+  CASE
+    WHEN campaign_name IS NULL OR campaign_name IN ('(data deleted)', '(direct)', '(organic)', '(referral)', '<Other>') THEN 'no_campaign'
+    ELSE campaign_name
+    END AS campaign,
+  category,
+  country,
+  user_pseudo_id,
+  purchase_flag,
+  purchase_revenue,
+  -- assigning bounces up to 5 second (sessions with duration <= 5 seconds)
+  CASE WHEN session_duration <= 5 THEN 1 ELSE 0 END AS bounce_5_flag,
+  -- assigning assigning bounces up to 60 seconds; there are no conversions in sessions up to 60 seconds, so they may be also considered as baounces
+  CASE WHEN session_duration <= 60 THEN 1 ELSE 0 END AS bounce_60_flag,
+  -- assigning session segments by session duration
+  CASE
+    WHEN session_duration <= 5 THEN "up_to_5_SEC"
+    WHEN session_duration <= 60 THEN "up_to_1_MIN"
+    WHEN session_duration <= 300 THEN "up_to_5_MIN"
+    WHEN session_duration <= 900 THEN "up_to_15_MIN"
+    WHEN session_duration <= 1800 THEN "up_to_30_MIN"
+    ELSE "over_30_MIN"
+    END AS user_engagement_segment
+  FROM
+  sessionDuration
+  ORDER BY
+  session_id
+  )
+-- validating results: number of rows in the result table 355.597 = number of distinct session_ids
+
+
+-- creating table of overall trends by marketing campaigns in "human readable format" (average session duration in MM:SS format, median of session duration in MM:SS format, min session duration in MM:SS, max session duration in HH:MM:SS, number of sessions, number of distinct users, number of conversions, conversion rate, number of bounces (sessions up to 5 seconds), bounce rate per campaign)
+
+SELECT
+  campaign,
+  -- ROUND(AVG(session_duration)) AS avg_session_duration_in_SEC,
+  -- converting seconds into MM:SS format
+  FORMAT('%02d:%02d', DIV(CAST(AVG(session_duration) AS INT64), 60), MOD(CAST(AVG(session_duration) AS INT64), 60)) AS avg_session_duration_in_MMSS,
+  -- APPROX_QUANTILES(session_duration, 2)[OFFSET(1)] AS median_session_duration_in_SEC,
+  -- converting seconds into MM:SS format
+  FORMAT('%02d:%02d', DIV(CAST(APPROX_QUANTILES(session_duration, 2)[OFFSET(1)] AS INT64), 60), MOD(CAST(APPROX_QUANTILES(session_duration, 2)[OFFSET(1)] AS INT64), 60)) AS median_session_duration_in_MMSS,
+  -- MIN(session_duration) AS min_session_duration_in_SEC,
+  -- converting seconds into MM:SS format
+  FORMAT('%02d:%02d', DIV(CAST(MIN(session_duration) AS INT64), 60), MOD(CAST(MIN(session_duration) AS INT64), 60)) AS min_session_duration_in_MMSS,
+  -- MAX(session_duration) AS max_session_duration_in_SEC,
+  -- converting seconds into HH:MM:SS format
+  FORMAT('%02d:%02d:%02d', DIV(CAST(MAX(session_duration) AS INT64), 3600), DIV(MOD(CAST(MAX(session_duration) AS INT64), 3600), 60), MOD(CAST(MOD(CAST(MAX(session_duration) AS INT64), 60) AS INT64), 60)) AS max_session_duration_in_HHMMSS,
+  COUNT(session_id) AS number_of_sessons,
+  COUNT(DISTINCT user_pseudo_id) AS number_of_distinct_users,
+  SUM(purchase_flag) AS number_of_conversions,
+  ROUND(SUM(purchase_flag) / COUNT(session_id), 4) AS conversion_rate,
+  ROUND(SUM(purchase_revenue), 2) AS purchase_revenue,
+  SUM(bounce_5_flag) AS number_of_bounces_in_5_seconds,
+  ROUND(SUM(bounce_5_flag) / COUNT(session_id), 4) AS bounce_rate_5,
+  SUM(bounce_60_flag) AS number_of_bounces_in_60_seconds,
+  ROUND(SUM(bounce_60_flag) / COUNT(session_id), 4) AS bounce_rate_60
+FROM
+final
+GROUP BY campaign
+ORDER BY avg_session_duration_in_MMSS DESC
