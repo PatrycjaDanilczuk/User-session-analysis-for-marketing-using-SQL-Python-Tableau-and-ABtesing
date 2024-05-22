@@ -27,7 +27,7 @@ Defined user session model implies, that one user can have multiple sessions on 
 ## 3.	Preparing and processing data
 
 ### 3.1.	Creating a table of unique sessions from raw_events table using SQL
-Table from this query has been used for analysis in the next steps of the project. To view the code go to the uploaded SQL file.
+Table from this query has been used for analysis in the next steps of the project. To view the code go to the uploaded SQL file [3.1. Sessions_data_query](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/3.1.%20Sessions_data_query)
 
 **SQL code logic explanation:**
 (click on Details to expand):
@@ -57,7 +57,7 @@ Table from this query has been used for analysis in the next steps of the projec
 </details>
   
 ### 3.2.	Extra step: “human readable format”: HH:MM:SS in SQL
-Creating SQL table of overall trends by marketing campaign in “human readable format”: HH:MM:SS. To view the code go to the uploaded SQL file.
+Creating SQL table of overall trends by marketing campaign in “human readable format”: HH:MM:SS. To view the code go to the uploaded SQL file [3.2. Sessions_agg_query](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/3.2.%20Sessions_agg_query)
 
 ## 4.	Analyzing data
 
@@ -66,16 +66,20 @@ Using Python for getting descriptive statistics, analyzing data distribution, im
 that should be used for further analysis of session duration variable across different dimensions, converting duration in seconds into “human readable format” HH:MM:SS, 
 conducting additional calculations not supported by Tableau. 
 
-The analysis and conclusions has been provided in 2 Jupyter Notebook files.
+The analysis and conclusions has been provided in 2 Jupyter Notebook files:
+
+[4.1.1. Python_session_duration_distribution](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/4.1.1.%20Python_session_duration_distribution_2024.ipynb)
+
+[4.1.2. Python_sessions_calculations](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/4.1.2.%20Python_sessions_calculations_2024.ipynb)
 
 ### 4.2.	Using Tableau for further analysis
 Preparing Table Dashboard with relevant visuals. The link to the dashboard can be find here: [Usser session analysis dashboard](https://public.tableau.com/views/Marketing_session_duration_dashboard_2024_automatic/DOverview?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link)
 
 ### 4.3. A/B Testing
 Using A/B testing online calculator for testing statistical significance of certain findings.  
-Results are presented in the PDF file. 
+Results are presented in the PDF file [4.3. AB_Testing results](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/4.3.%20AB%20Testing%20results_session_duration_2024.pdf)
 
 ## 5.	Communicating analysis results and providing actionable insights
-Preparing presentation for business. The presentation has benn uploaded in PDF file. Go to the uploaded PDF file.
+Preparing presentation for business. The presentation has benn uploaded in PDF file [5. Presentation](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/5.%20Presentation_session_duration_analysis_2024.pdf)
 
-Use Tableau dashboard for more in depth analysis.
+Use Tableau [Usser session analysis dashboard](https://public.tableau.com/views/Marketing_session_duration_dashboard_2024_automatic/DOverview?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link) for more in depth analysis.
