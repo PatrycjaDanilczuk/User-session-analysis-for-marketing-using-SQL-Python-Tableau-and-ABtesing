@@ -69,7 +69,7 @@ conducting additional calculations not supported by Tableau.
 The analysis and conclusions has been provided in 2 Jupyter Notebook files.
 
 ### 4.2.	Using Tableau for further analysis
-Preparing Dashboard with relevant visuals. Link to dashboard: https://public.tableau.com/views/Marketing_session_duration_dashboard_2024_automatic/DOverview?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link
+Preparing Table Dashboard with relevant visuals. The link to the dashboard can be find here: [Usser session analysis dashboard](https://public.tableau.com/views/Marketing_session_duration_dashboard_2024_automatic/DOverview?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link)
 
 ### 4.3. A/B Testing
 Using A/B testing online calculator for testing statistical significance of certain findings.  
