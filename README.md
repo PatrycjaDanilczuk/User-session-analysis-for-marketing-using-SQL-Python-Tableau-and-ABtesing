@@ -4,9 +4,51 @@
 Identify overall trends of all marketing campaigns on ecommerce site of the company. Find out if users tend to spend more time on the website on certain weekdays and how that behavior differs across campaigns. 
 Present dynamic weekday duration, focusing on differences between marketing campaigns. Analyze whether there are interesting data points, that can give more insights. Provide visuals and presentation for business.
 
-Data set: use  raw_events table stored in BiqQuery
+**Data set:** use  raw_events table stored in BiqQuery
 
 Important note: there are no session identifiers in the dataset, therefore it is necessary to come up with logic for how to model sessions, calculate session duration and convert it to human readable format.
+
+<details>
+
+<summary>Click to expand dataset schema</summary>
+
+
+| Field name | Type | Mode |
+|---------------|-----------|-----------|
+| event_date | STRING | NULLABLE |
+| event_timestamp | INTEGER | NULLABLE |
+| event_name |	 STRING | NULLABLE |
+| event_value_in_usd| FLOAT| NULLABLE|
+| user_id | STRING| NULLABLE|
+| user_pseudo_id| STRING| NULLABLE|
+| user_first_touch_timestamp| INTEGER| NULLABLE|
+| category| STRING| NULLABLE |
+| mobile_model_name | STRING| NULLABLE |
+| mobile_brand_name |STRING | NULLABLE |
+| operating_system | STRING | NULLABLE |
+| language | STRING | NULLABLE |
+| is_limited_ad_tracking| STRING | NULLABLE |
+| browser | STRING | NULLABLE |
+| browser_version | STRING | NULLABLE |
+| country | STRING | NULLABLE |
+| medium | STRING | NULLABLE |
+| name | STRING | NULLABLE |
+| traffic_source | STRING | NULLABLE |
+| platform | STRING | NULLABLE |
+| total_item_quantity | INTEGER | NULLABLE |
+| purchase_revenue_in_usd | FLOAT | NULLABLE |
+| refund_value_in_usd | FLOAT | NULLABLE |
+| shipping_value_in_usd | FLOAT | NULLABLE |
+| tax_value_in_usd | FLOAT | NULLABLE |
+| transaction_id	 | STRING | NULLABLE |
+| page_title | STRING | NULLABLE |
+| page_location	 | STRING | NULLABLE |
+| source | STRING | NULLABLE |
+| page_referrer	 | STRING | NULLABLE |
+| campaign | STRING | NULLABLE |
+
+</details>
+
 
 ## 2.	Defining user session model
 User session typically represents a continuous period of user activity on a website or application. We’ll consider a session as a sequence of events by the same user with relatively short gaps between them. 
@@ -30,8 +72,9 @@ Defined user session model implies, that one user can have multiple sessions on 
 Table from this query has been used for analysis in the next steps of the project. To view the code go to the uploaded SQL file [3.1. Sessions_data_query](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/3.1.%20Sessions_data_query)
 
 **SQL code logic explanation:**
-(click on Details to expand):
 <details>
+
+<summary>Click to expand the code details</summary>
 
   1)	Identify columns for the analysis: user_pseudo_id, category, campaign, country, event_name, purchase_revenue_in_usd, event_timestamp
   2)	Converting event_timestamp into datetime in microseconds using TIMESTAMP_MICROS()
