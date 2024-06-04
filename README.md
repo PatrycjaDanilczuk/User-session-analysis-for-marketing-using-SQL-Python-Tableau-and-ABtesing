@@ -6,7 +6,7 @@ Present dynamic weekday duration, focusing on differences between marketing camp
 
 ## Dataset description
 
-Use  raw_events table hosted in BiqQuery project. Data in raw_events table captures a lot of events from users based on their timestamps.
+Use  **raw_events table** hosted in **BigQuery** project. Data in raw_events table captures a lot of events from users based on their timestamps.
 
 Important note: there are no session identifiers in the dataset, therefore it is necessary to come up with logic for how to model sessions, calculate session duration and convert it to human readable format.
 
