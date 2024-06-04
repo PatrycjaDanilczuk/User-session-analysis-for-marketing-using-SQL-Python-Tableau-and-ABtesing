@@ -1,10 +1,10 @@
-### User session analysis - project for marketing
+## User session analysis - project for marketing
 # Project overview
 ## 1. Defining business problem
 Identify overall trends of all marketing campaigns on ecommerce site of the company. Find out if users tend to spend more time on the website on certain weekdays and how that behavior differs across campaigns. 
 Present dynamic weekday duration, focusing on differences between marketing campaigns. Analyze whether there are interesting data points, that can give more insights. Provide visuals and presentation for business.
 
-## Dataset description
+### Dataset description
 
 Use  **raw_events table** hosted in **BigQuery** project. Data in raw_events table captures a lot of events from users based on their timestamps.
 
@@ -12,7 +12,7 @@ Use  **raw_events table** hosted in **BigQuery** project. Data in raw_events tab
 
 <details>
 
-<summary>Click to expand raw_events dataset schema</summary>
+**<summary>Click to expand raw_events table schema</summary>**
 
 ### raw_events schema
 
@@ -74,21 +74,22 @@ Defined user session model implies, that one user can have multiple sessions on 
 ### 3.1.	Creating a table of unique sessions from raw_events table using SQL
 Table from this query has been used for analysis in the next steps of the project. To view the code go to the uploaded SQL file [3.1. Sessions_data_query](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/3.1.%20Sessions_data_query)
 
-**SQL code logic explanation:**
 <details>
 
-<summary>Click to expand the code details</summary>
+**<summary>Click to expand the SQL code logic details</summary>**
 
-  1)	Identify columns for the analysis: user_pseudo_id, category, campaign, country, event_name, purchase_revenue_in_usd, event_timestamp
-  2)	Converting event_timestamp into datetime in microseconds using TIMESTAMP_MICROS()
-  3)	Creating unique user_session_id (user can come to website from different devices, events on different devices should be considered as separate sessions)
-  4)	Calculating difference between time ordered events in seconds per user_session_id  using LAG() and TIMESTAMP_DIFF()
-  5)	Assigning gaps in sessions - if the difference between time ordered events is longer than 30 minutes, this will be considered as a break in session, the event assigned as break in session will be considered as a start of a new session
-  6)	Assigning session number per user_session_id (user can have multiple sessions) using SUM() OVER
-  7)	Creating session_id  from user_session_id and session_number - each session will be assigned with individual id
-  8)	Getting session start time and session end time for each session_id using MIN() OVER and MAX()OVER
-  9)	Calculating session duration in seconds
-  10)	Creating additional fields for analysis:
+### SQL code logic explanation:
+
+1. Identify columns for the analysis: user_pseudo_id, category, campaign, country, event_name, purchase_revenue_in_usd, event_timestamp
+2. Converting event_timestamp into datetime in microseconds using TIMESTAMP_MICROS()
+3. Creating unique user_session_id (user can come to website from different devices, events on different devices should be considered as separate sessions)
+4. Calculating difference between time ordered events in seconds per user_session_id  using LAG() and TIMESTAMP_DIFF()
+5. Assigning gaps in sessions - if the difference between time ordered events is longer than 30 minutes, this will be considered as a break in session, the event assigned as break in session will be considered as a start of a new session
+6. Assigning session number per user_session_id (user can have multiple sessions) using SUM() OVER
+7. Creating session_id  from user_session_id and session_number - each session will be assigned with individual id
+8. Getting session start time and session end time for each session_id using MIN() OVER and MAX()OVER
+9. Calculating session duration in seconds
+10. Creating additional fields for analysis:
       
   -	purchase_flag  (if the session ended up with purchase then 1)
   -	campaign (session will be assigned to a campaign, if there was at least one event in the session assigned to a campaign, other sessions assigned as no_campaign)
@@ -99,7 +100,7 @@ Table from this query has been used for analysis in the next steps of the projec
   -	bounce_10_flag (sessions with duration <= 60 seconds)
   - user_engagement_segment –  based on time spent on site:  "up_to_5_SEC”,  "up_to_1_MIN",  "up_to_5_MIN", "up_to_15_MIN", "up_to_30_MIN", "over_30_MIN"
     
-11) Selecting table of distinct sessions with relevant data for each session
+11. Selecting table of distinct sessions with relevant data for each session
 </details>
   
 ### 3.2.	Extra step: “human readable format”: HH:MM:SS in SQL
