@@ -1,4 +1,4 @@
-# User session analysis - marketing project
+### User session analysis - project for marketing
 # Project overview
 ## 1. Defining business problem
 Identify overall trends of all marketing campaigns on ecommerce site of the company. Find out if users tend to spend more time on the website on certain weekdays and how that behavior differs across campaigns. 
@@ -8,11 +8,11 @@ Present dynamic weekday duration, focusing on differences between marketing camp
 
 Use  **raw_events table** hosted in **BigQuery** project. Data in raw_events table captures a lot of events from users based on their timestamps.
 
-Important note: there are no session identifiers in the dataset, therefore it is necessary to come up with logic for how to model sessions, calculate session duration and convert it to human readable format.
+**Important note:** there are no session identifiers in the dataset, therefore it is necessary to come up with logic for how to model sessions, calculate session duration and convert it to human readable format.
 
 <details>
 
-<summary>Click to expand dataset schema</summary>
+<summary>Click to expand raw_events dataset schema</summary>
 
 ### raw_events schema
 
