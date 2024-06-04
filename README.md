@@ -12,6 +12,7 @@ Important note: there are no session identifiers in the dataset, therefore it is
 
 <summary>Click to expand dataset schema</summary>
 
+### raw_events schema
 
 | Field name | Type | Mode |
 |---------------|-----------|-----------|
