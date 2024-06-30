@@ -74,6 +74,9 @@ Defined user session model implies, that one user can have multiple sessions on 
 ## 3.	Preparing and processing data
 
 ### 3.1.	Creating a table of unique sessions from raw_events table using SQL
+
+Out of over 4 mln events from raw_events table created a table of 355.597 unique user sessions with relevant data per session. 
+
 Table from this query has been used for analysis in the next steps of the project. To view the code go to the uploaded SQL file [3.1. Sessions_data_query](https://github.com/PatrycjaDanilczuk/User-session-analysis-marketing-project/blob/main/3.1.%20Sessions_data_query)
 
 <details>
